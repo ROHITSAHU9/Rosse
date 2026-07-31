@@ -15,7 +15,7 @@ body {
   overflow: hidden;
 }
 
-/* UI Card */
+/* Card UI */
 .card {
   background: #111111;
   border: 1px solid #222222;
@@ -93,20 +93,20 @@ body {
 .flower {
   position: relative;
   width: 200px;
-  height: 280px;
+  height: 300px;
   display: flex;
   justify-content: center;
 }
 
-/* Green Stem */
+/* Stem */
 .stem {
   position: absolute;
   bottom: 0;
   width: 6px;
   height: 0;
-  background: linear-gradient(to top, #133e1a, #2e8b57);
+  background: linear-gradient(to top, #113816, #2e8b57);
   border-radius: 3px;
-  animation: growStem 2s forwards ease-in-out;
+  animation: growStem 1.8s forwards ease-in-out;
 }
 
 @keyframes growStem {
@@ -116,8 +116,8 @@ body {
 /* Leaves */
 .leaf {
   position: absolute;
-  width: 30px;
-  height: 16px;
+  width: 32px;
+  height: 18px;
   background: #2e8b57;
   border-radius: 0 100px 0 100px;
   opacity: 0;
@@ -125,17 +125,17 @@ body {
 
 .leaf-left {
   bottom: 50px;
-  left: 72px;
+  left: 70px;
   transform-origin: right bottom;
   animation: bloomLeafLeft 0.8s 1.2s forwards ease-out;
 }
 
 .leaf-right {
   bottom: 85px;
-  right: 72px;
+  right: 70px;
   transform: scaleX(-1);
   transform-origin: left bottom;
-  animation: bloomLeafRight 0.8s 1.5s forwards ease-out;
+  animation: bloomLeafRight 0.8s 1.4s forwards ease-out;
 }
 
 @keyframes bloomLeafLeft {
@@ -146,52 +146,76 @@ body {
   to { opacity: 1; transform: scaleX(-1) rotate(-25deg) scale(1); }
 }
 
-/* Petals */
+/* Petals Center Base */
 #petals {
   position: absolute;
-  top: 120px;
+  top: 130px;
   width: 0;
   height: 0;
 }
 
+/* Curved Rose Petal Base */
 .petal {
   position: absolute;
   left: 50%;
   top: 50%;
-  background: radial-gradient(circle at 50% 20%, #ff2a5f 0%, #b7002c 70%, #680018 100%);
+  background: radial-gradient(circle at 50% 15%, #ff3b68 0%, #b8002e 55%, #4a0011 100%);
   border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
   transform-origin: bottom center;
   opacity: 0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  animation: bloomPetal 1.8s forwards ease-out;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.6);
+  animation: bloomPetal 2s forwards ease-out;
 }
 
+/* Inside-Out Bloom Animation Keyframes */
 @keyframes bloomPetal {
   0% {
     opacity: 0;
-    transform: translate(-50%, -100%) rotate(var(--angle)) scale(0);
+    transform: translate(-50%, -100%) rotate(var(--angle)) scale(0) translateY(10px);
+  }
+  40% {
+    opacity: 0.95;
   }
   100% {
-    opacity: 0.92;
+    opacity: 0.98;
     transform: translate(-50%, -100%) rotate(var(--angle)) translateY(var(--ty)) scale(var(--scale));
   }
 }
 
-/* End Text Message */
+/* Center Rose Bud (कली का अंदरूनी भाग) */
+.rose-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 16px;
+  height: 26px;
+  background: radial-gradient(circle at 50% 10%, #ff4d79 0%, #8b0021 100%);
+  border-radius: 50% 50% 40% 40%;
+  transform: translate(-50%, -100%);
+  z-index: 10;
+  opacity: 0;
+  animation: bloomCore 1.2s 1.5s forwards ease-out;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+
+@keyframes bloomCore {
+  to { opacity: 1; transform: translate(-50%, -100%) scale(1.1); }
+}
+
+/* End Message Text */
 .message {
   margin-top: 25px;
   text-align: center;
-  font-size: 20px;
+  font-size: 21px;
   color: #ff6b8b;
   line-height: 1.4;
   opacity: 0;
-  animation: fadeIn 1.5s 2.8s forwards;
+  animation: fadeIn 1.5s 3.8s forwards;
   font-family: 'Georgia', serif;
   font-style: italic;
+  text-shadow: 0 0 10px rgba(255, 42, 95, 0.3);
 }
 
 @keyframes fadeIn {
   to { opacity: 1; }
 }
-
-
