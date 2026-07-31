@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love.css</title>
+  <title>3D Realistic Rose Bloom</title>
   <style>
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
@@ -16,15 +16,15 @@
       color: #ffffff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       height: 100vh;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
     }
 
     /* Start UI Box */
     .card {
-      background: #121212;
+      background: #111111;
       border: 1px solid #222222;
       border-radius: 20px;
       padding: 30px 40px;
@@ -32,6 +32,7 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
       width: 280px;
       z-index: 10;
+      position: absolute;
     }
 
     .flower-icon {
@@ -62,19 +63,7 @@
       font-size: 12px;
       letter-spacing: 1px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.4);
-    }
-
-    #bloom-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    #bloom-btn.ready {
-      background: #ff1e53;
-      box-shadow: 0 0 20px rgba(255, 30, 83, 0.8);
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
       animation: pulse 1.5s infinite;
     }
 
@@ -88,200 +77,268 @@
       display: none !important;
     }
 
-    /* Flower Area */
-    #flower-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
+    /* 3D Canvas Screen */
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
       position: relative;
     }
 
-    .flower {
-      position: relative;
-      width: 200px;
-      height: 300px;
-      display: flex;
-      justify-content: center;
-    }
-
-    /* Stem Animation */
-    .stem {
-      position: absolute;
-      bottom: 0;
-      width: 8px;
-      height: 0;
-      background: linear-gradient(to top, #154314, #2e8b57);
-      border-radius: 4px;
-      animation: growStem 2s forwards ease-in-out;
-    }
-
-    @keyframes growStem {
-      to { height: 180px; }
-    }
-
-    /* Leaf Animation */
-    .leaf {
-      position: absolute;
-      width: 35px;
-      height: 20px;
-      background: #2e8b57;
-      border-radius: 0 100px 0 100px;
-      opacity: 0;
-    }
-
-    .leaf-left {
-      bottom: 60px;
-      left: 65px;
-      transform-origin: right bottom;
-      animation: bloomLeafLeft 0.8s 1.2s forwards ease-out;
-    }
-
-    .leaf-right {
-      bottom: 100px;
-      right: 65px;
-      transform: scaleX(-1);
-      transform-origin: left bottom;
-      animation: bloomLeafRight 0.8s 1.5s forwards ease-out;
-    }
-
-    @keyframes bloomLeafLeft {
-      to { opacity: 1; transform: rotate(-25deg) scale(1); }
-    }
-
-    @keyframes bloomLeafRight {
-      to { opacity: 1; transform: scaleX(-1) rotate(-25deg) scale(1); }
-    }
-
-    /* Petals Base */
-    #petals {
-      position: absolute;
-      top: 120px;
-      width: 0;
-      height: 0;
-    }
-
-    .petal {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      background: radial-gradient(circle at 50% 20%, #ff2a5f, #a7002c 90%);
-      border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
-      transform-origin: bottom center;
-      opacity: 0;
-      box-shadow: 0 0 10px rgba(255, 42, 95, 0.3);
-      animation: bloomPetal 2.1s forwards ease-out;
-    }
-
-    @keyframes bloomPetal {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -100%) rotate(var(--angle)) scale(0);
-      }
-      100% {
-        opacity: 0.9;
-        transform: translate(-50%, -100%) rotate(var(--angle)) translateY(var(--ty)) scale(var(--scale));
-      }
-    }
-
-    /* End Message Text */
     .message {
-      margin-top: 30px;
+      position: absolute;
+      bottom: 8%;
+      width: 100%;
       text-align: center;
-      font-size: 22px;
-      color: #ff6b8b;
-      line-height: 1.4;
-      opacity: 0;
-      animation: fadeIn 1.5s 3s forwards;
-      font-family: 'Georgia', serif;
+      font-size: 28px;
+      color: #ff758f;
+      font-family: 'Georgia', cursive, serif;
       font-style: italic;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      text-shadow: 0 0 15px rgba(255, 117, 143, 0.7);
     }
 
-    @keyframes fadeIn {
-      to { opacity: 1; }
+    .message.show {
+      opacity: 1;
     }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
   <div id="loading-box" class="card">
     <div class="flower-icon">🌹</div>
     <h2>Love.css</h2>
-    <p id="loading-status">Loading Love.css ...</p>
-    <button id="bloom-btn" disabled>TAP TO BLOOM</button>
+    <p>Ready to bloom!</p>
+    <button id="bloom-btn">TAP TO BLOOM</button>
   </div>
 
-  <div id="flower-container" class="hidden">
-    <div class="flower">
-      <div class="stem"></div>
-      <div class="leaf leaf-left"></div>
-      <div class="leaf leaf-right"></div>
-      <div id="petals"></div>
-    </div>
-    <div class="message">I coded this for<br>you 🌹</div>
+  <div id="canvas-container" class="hidden">
+    <div id="text-msg" class="message">I coded this for you</div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const loadingStatus = document.getElementById('loading-status');
-      const bloomBtn = document.getElementById('bloom-btn');
-      const loadingBox = document.getElementById('loading-box');
-      const flowerContainer = document.getElementById('flower-container');
+    const bloomBtn = document.getElementById('bloom-btn');
+    const loadingBox = document.getElementById('loading-box');
+    const canvasContainer = document.getElementById('canvas-container');
+    const textMsg = document.getElementById('text-msg');
 
-      // Exact Loading Logic from video screen
-      setTimeout(() => { loadingStatus.textContent = "Growing digital petals ..."; }, 800);
-      setTimeout(() => { loadingStatus.textContent = "Optimizing 3D rendering ..."; }, 1600);
-      setTimeout(() => {
-        loadingStatus.textContent = "Ready to bloom!";
-        bloomBtn.disabled = false;
-        bloomBtn.classList.add('ready');
-      }, 2400);
+    bloomBtn.addEventListener('click', () => {
+      loadingBox.classList.add('hidden');
+      canvasContainer.classList.remove('hidden');
+      init3DRose();
+    });
 
-      bloomBtn.addEventListener('click', () => {
-        loadingBox.classList.add('hidden');
-        flowerContainer.classList.remove('hidden');
-        createPetals();
+    function init3DRose() {
+      // 1. Scene & Renderer
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      canvasContainer.appendChild(renderer.domElement);
+
+      // 2. Realistic Lights
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+      mainLight.position.set(5, 10, 7);
+      mainLight.castShadow = true;
+      scene.add(mainLight);
+
+      const softRedLight = new THREE.PointLight(0xff0044, 1.5, 10);
+      softRedLight.position.set(-3, 3, 3);
+      scene.add(softRedLight);
+
+      // 3. Materials
+      const stemMat = new THREE.MeshStandardMaterial({
+        color: 0x2e7d32,
+        roughness: 0.6,
+        metalness: 0.1
       });
 
-      // EXACT Code from the video snippet (@CODEWITHANURAGDEV)
-      function createPetals() {
-        const PETAL_LAYERS = [
-          { layer: 1, count: 11, w: 35, h: 55 },
-          { layer: 2, count: 9,  w: 28, h: 45 },
-          { layer: 3, count: 7,  w: 22, h: 35 }
-        ];
+      const leafMat = new THREE.MeshStandardMaterial({
+        color: 0x388e3c,
+        roughness: 0.4,
+        side: THREE.DoubleSide
+      });
 
-        const petalsContainer = document.getElementById('petals');
+      const petalMat = new THREE.MeshStandardMaterial({
+        color: 0xd90429,
+        roughness: 0.35,
+        metalness: 0.05,
+        side: THREE.DoubleSide
+      });
 
-        PETAL_LAYERS.forEach(({ layer, count, w, h }) => {
-          const angleStep = 360 / count;
-          const layerOffset = 11 * 24 + (Math.random() - 0.5) * 8;
+      // 4. Main Plant Group
+      const plantGroup = new THREE.Group();
+      plantGroup.position.y = -2.5;
+      scene.add(plantGroup);
 
-          for (let i = 0; i < count; i++) {
-            const petal = document.createElement('div');
-            petal.className = `petal layer-${layer}`;
+      // 4a. Stem Curve (Curved Growing Stem)
+      const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -2, 0),
+        new THREE.Vector3(0.1, -0.5, 0),
+        new THREE.Vector3(-0.05, 1, 0),
+        new THREE.Vector3(0, 2.2, 0)
+      ]);
 
-            const angle = layerOffset + i * angleStep + (Math.random() - 0.5) * 5;
-            const delay = 1.0 + (layer * 0.2) + (i * 0.05);
-            const scaleFilter = 0.94 + (Math.random() - 0.5) * 0.12;
-            const bloomDur = 2.1 + Math.random() * 0.4;
-            const translateY = -(layer * 5);
+      const stemGeo = new THREE.TubeGeometry(curve, 64, 0.06, 16, false);
+      const stem = new THREE.Mesh(stemGeo, stemMat);
+      stem.scale.set(1, 0.001, 1); // Start with 0 height
+      plantGroup.add(stem);
 
-            petal.style.width = `${w}px`;
-            petal.style.height = `${h}px`;
-            petal.style.animationDelay = `${delay}s`;
-            petal.style.animationDuration = `${bloomDur}s`;
+      // 4b. Leaves Setup
+      const leaves = [];
+      const leafPositions = [
+        { y: 0.2, rotY: Math.PI / 4, rotZ: -0.4 },
+        { y: 0.8, rotY: -Math.PI / 3, rotZ: 0.4 },
+        { y: 1.4, rotY: Math.PI / 2, rotZ: -0.3 }
+      ];
 
-            petal.style.setProperty('--angle', `${angle}deg`);
-            petal.style.setProperty('--scale', scaleFilter);
-            petal.style.setProperty('--ty', `${translateY}px`);
+      leafPositions.forEach(pos => {
+        const leafShape = new THREE.Shape();
+        leafShape.moveTo(0, 0);
+        leafShape.bezierCurveTo(-0.3, 0.2, -0.4, 0.8, 0, 1.2);
+        leafShape.bezierCurveTo(0.4, 0.8, 0.3, 0.2, 0, 0);
 
-            petalsContainer.appendChild(petal);
-          }
-        });
+        const leafGeo = new THREE.ShapeGeometry(leafShape);
+        const leaf = new THREE.Mesh(leafGeo, leafMat);
+        leaf.position.set(0, pos.y, 0);
+        leaf.rotation.y = pos.rotY;
+        leaf.rotation.z = pos.rotZ;
+        leaf.scale.set(0, 0, 0); // Hide initially
+
+        plantGroup.add(leaf);
+        leaves.push({ mesh: leaf, targetY: pos.y });
+      });
+
+      // 4c. Rose Flower Head Setup
+      const roseHead = new THREE.Group();
+      roseHead.position.set(0, 2.2, 0);
+      plantGroup.add(roseHead);
+
+      // Green Calyx (Base of Rose)
+      const calyxMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32 });
+      for (let i = 0; i < 5; i++) {
+        const calyxGeo = new THREE.ConeGeometry(0.08, 0.4, 8);
+        const calyxLeaf = new THREE.Mesh(calyxGeo, calyxMat);
+        calyxLeaf.rotation.z = -0.6;
+        calyxLeaf.rotation.y = (i / 5) * Math.PI * 2;
+        calyxLeaf.position.y = -0.1;
+        roseHead.add(calyxLeaf);
       }
-    });
+
+      // 3D Petals Layers
+      const petals = [];
+      const layers = [
+        { count: 4,  size: 0.25, rotXStart: 0.1, rotXEnd: 1.2, r: 0.08 },
+        { count: 6,  size: 0.35, rotXStart: 0.15, rotXEnd: 1.0, r: 0.18 },
+        { count: 8,  size: 0.45, rotXStart: 0.2, rotXEnd: 0.85, r: 0.30 },
+        { count: 10, size: 0.55, rotXStart: 0.25, rotXEnd: 0.7, r: 0.45 }
+      ];
+
+      layers.forEach((layer, lIdx) => {
+        for (let i = 0; i < layer.count; i++) {
+          const angle = (i / layer.count) * Math.PI * 2 + (lIdx * 0.4);
+
+          // Curved Petal Geometry
+          const petalGeo = new THREE.SphereGeometry(
+            layer.size, 16, 16, 0, Math.PI, 0, Math.PI / 2
+          );
+          const petal = new THREE.Mesh(petalGeo, petalMat);
+
+          petal.scale.set(1, 1.3, 0.25);
+          petal.rotation.y = angle;
+          petal.rotation.x = layer.rotXStart;
+
+          petal.userData = {
+            layer: lIdx,
+            angle: angle,
+            startRotX: layer.rotXStart,
+            endRotX: layer.rotXEnd,
+            targetRadius: layer.r
+          };
+
+          roseHead.add(petal);
+          petals.push(petal);
+        }
+      });
+
+      // Camera Position
+      camera.position.set(0, 0, 5.5);
+
+      // Animation Loop
+      let progress = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        if (progress < 1) {
+          progress += 0.004;
+
+          // Step 1: Grow Stem Upward (0 to 0.4 progress)
+          if (progress < 0.4) {
+            const stemScale = progress / 0.4;
+            stem.scale.set(1, stemScale, 1);
+          } else {
+            stem.scale.set(1, 1, 1);
+          }
+
+          // Step 2: Unfold Leaves (0.3 to 0.6 progress)
+          leaves.forEach((l, idx) => {
+            const leafStart = 0.2 + idx * 0.1;
+            if (progress > leafStart) {
+              const lProgress = Math.min((progress - leafStart) * 4, 1);
+              l.mesh.scale.set(lProgress * 0.8, lProgress * 0.8, lProgress * 0.8);
+            }
+          });
+
+          // Step 3: Bloom Flower Petals (0.5 to 0.95 progress)
+          if (progress > 0.45) {
+            petals.forEach(p => {
+              const delay = 0.45 + p.userData.layer * 0.1;
+              if (progress > delay) {
+                const pProgress = Math.min((progress - delay) * 2.5, 1);
+
+                // Rotate petals outward
+                p.rotation.x = THREE.MathUtils.lerp(p.userData.startRotX, p.userData.endRotX, pProgress);
+
+                // Expand radius
+                const currentR = THREE.MathUtils.lerp(0, p.userData.targetRadius, pProgress);
+                p.position.x = Math.sin(p.userData.angle) * currentR;
+                p.position.z = Math.cos(p.userData.angle) * currentR;
+              }
+            });
+          }
+
+          // Step 4: Show text message at end
+          if (progress >= 0.9) {
+            textMsg.classList.add('show');
+          }
+        }
+
+        // Gentle 3D rotation for dramatic viewing effect
+        plantGroup.rotation.y += 0.003;
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Window Resize Listener
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
   </script>
 </body>
 </html>
+
