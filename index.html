@@ -1,54 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blooming Flower</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love.css</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div class="night"></div>
+  <div id="loading-box" class="card">
+    <div class="flower-icon">🌹</div>
+    <h2>Love.css</h2>
+    <p id="loading-status">Loading Love.css ...</p>
+    <button id="bloom-btn" disabled>TAP TO BLOOM</button>
+  </div>
 
-<div class="flowers">
+  <div id="flower-container" class="hidden">
+    <div class="flower">
+      <div class="stem"></div>
+      <div class="leaf leaf-left"></div>
+      <div class="leaf leaf-right"></div>
+      <div id="petals"></div>
+    </div>
+    <div class="message">I coded this for<br>you 🌹</div>
+  </div>
 
-<div class="flower flower--1">
-
-<div class="flower__leafs">
-
-<div class="flower__leaf flower__leaf--1"></div>
-<div class="flower__leaf flower__leaf--2"></div>
-<div class="flower__leaf flower__leaf--3"></div>
-<div class="flower__leaf flower__leaf--4"></div>
-<div class="flower__white-circle"></div>
-
-</div>
-
-<div class="flower__line">
-
-<div class="flower__line__leaf flower__line__leaf--1"></div>
-<div class="flower__line__leaf flower__line__leaf--2"></div>
-
-</div>
-
-</div>
-
-<div class="glow"></div>
-
-</div>
-
-<div class="text">
-
-<h1>I ❤️ YOU</h1>
-
-<p>Made With Love</p>
-
-</div>
-
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>
