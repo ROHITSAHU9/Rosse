@@ -1,284 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love.css</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blooming Flower</title>
 
-    body {
-      background-color: #000000;
-      color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-    /* Start Card */
-    .card {
-      background: #111111;
-      border: 1px solid #222222;
-      border-radius: 20px;
-      padding: 30px 40px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
-      width: 280px;
-      z-index: 10;
-    }
+body{
+background:#000814;
+display:flex;
+justify-content:center;
+align-items:flex-end;
+height:100vh;
+overflow:hidden;
+}
 
-    .flower-icon {
-      font-size: 35px;
-      margin-bottom: 12px;
-    }
+.scene{
+position:relative;
+width:300px;
+height:500px;
+}
 
-    .card h2 {
-      font-size: 20px;
-      margin-bottom: 6px;
-      font-weight: 600;
-    }
+.stem{
+position:absolute;
+bottom:0;
+left:50%;
+transform:translateX(-50%);
+width:8px;
+height:0;
+background:#0f0;
+border-radius:20px;
+animation:growStem 3s forwards;
+}
 
-    .card p {
-      font-size: 13px;
-      color: #888888;
-      margin-bottom: 25px;
-    }
+.leaf{
+position:absolute;
+width:70px;
+height:30px;
+background:#1aff66;
+border-radius:100% 0;
+opacity:0;
+}
 
-    #bloom-btn {
-      width: 100%;
-      padding: 12px 0;
-      border: none;
-      border-radius: 25px;
-      background: #ff2a5f;
-      color: white;
-      font-weight: bold;
-      font-size: 12px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(255, 42, 95, 0.4);
-    }
+.left{
+bottom:180px;
+left:95px;
+transform:rotate(-35deg);
+animation:leafShow 1s 2.3s forwards;
+}
 
-    #bloom-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+.right{
+bottom:250px;
+right:95px;
+transform:scaleX(-1) rotate(-35deg);
+animation:leafShow 1s 2.8s forwards;
+}
 
-    #bloom-btn.ready {
-      background: #ff1e53;
-      box-shadow: 0 0 20px rgba(255, 30, 83, 0.8);
-      animation: pulse 1.5s infinite;
-    }
+.flower{
+position:absolute;
+bottom:340px;
+left:50%;
+transform:translateX(-50%) scale(0);
+animation:bloom .8s 3s forwards;
+}
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.03); }
-      100% { transform: scale(1); }
-    }
+.petal{
+position:absolute;
+width:45px;
+height:80px;
+background:#ff4fa3;
+border-radius:50%;
+transform-origin:bottom center;
+}
 
-    .hidden {
-      display: none !important;
-    }
+.p1{transform:rotate(0deg) translateY(-35px);}
+.p2{transform:rotate(45deg) translateY(-35px);}
+.p3{transform:rotate(90deg) translateY(-35px);}
+.p4{transform:rotate(135deg) translateY(-35px);}
+.p5{transform:rotate(180deg) translateY(-35px);}
+.p6{transform:rotate(225deg) translateY(-35px);}
+.p7{transform:rotate(270deg) translateY(-35px);}
+.p8{transform:rotate(315deg) translateY(-35px);}
 
-    /* Flower Screen */
-    #flower-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      position: relative;
-    }
+.center{
+position:absolute;
+width:35px;
+height:35px;
+background:gold;
+border-radius:50%;
+left:5px;
+top:5px;
+}
 
-    .flower {
-      position: relative;
-      width: 200px;
-      height: 280px;
-      display: flex;
-      justify-content: center;
-    }
+@keyframes growStem{
+100%{height:350px;}
+}
 
-    /* Green Stem */
-    .stem {
-      position: absolute;
-      bottom: 0;
-      width: 6px;
-      height: 0;
-      background: linear-gradient(to top, #133e1a, #2e8b57);
-      border-radius: 3px;
-      animation: growStem 2s forwards ease-in-out;
-    }
+@keyframes bloom{
+100%{
+transform:translateX(-50%) scale(1);
+}
+}
 
-    @keyframes growStem {
-      to { height: 160px; }
-    }
-
-    /* Leaves */
-    .leaf {
-      position: absolute;
-      width: 30px;
-      height: 16px;
-      background: #2e8b57;
-      border-radius: 0 100px 0 100px;
-      opacity: 0;
-    }
-
-    .leaf-left {
-      bottom: 50px;
-      left: 72px;
-      transform-origin: right bottom;
-      animation: bloomLeafLeft 0.8s 1.2s forwards ease-out;
-    }
-
-    .leaf-right {
-      bottom: 85px;
-      right: 72px;
-      transform: scaleX(-1);
-      transform-origin: left bottom;
-      animation: bloomLeafRight 0.8s 1.5s forwards ease-out;
-    }
-
-    @keyframes bloomLeafLeft {
-      to { opacity: 1; transform: rotate(-25deg) scale(1); }
-    }
-
-    @keyframes bloomLeafRight {
-      to { opacity: 1; transform: scaleX(-1) rotate(-25deg) scale(1); }
-    }
-
-    /* Rose Petals Base */
-    #petals {
-      position: absolute;
-      top: 120px;
-      width: 0;
-      height: 0;
-    }
-
-    .petal {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      background: radial-gradient(circle at 50% 20%, #ff2a5f 0%, #b7002c 70%, #680018 100%);
-      border-radius: 50% 50% 50% 50% / 80% 80% 20% 20%;
-      transform-origin: bottom center;
-      opacity: 0;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-      animation: bloomPetal 1.8s forwards ease-out;
-    }
-
-    @keyframes bloomPetal {
-      0% {
-        opacity: 0;
-        transform: translate(-50%, -100%) rotate(var(--angle)) scale(0);
-      }
-      100% {
-        opacity: 0.92;
-        transform: translate(-50%, -100%) rotate(var(--angle)) translateY(var(--ty)) scale(var(--scale));
-      }
-    }
-
-    /* Message Text */
-    .message {
-      margin-top: 25px;
-      text-align: center;
-      font-size: 20px;
-      color: #ff6b8b;
-      line-height: 1.4;
-      opacity: 0;
-      animation: fadeIn 1.5s 2.8s forwards;
-      font-family: 'Georgia', serif;
-      font-style: italic;
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-  </style>
+@keyframes leafShow{
+to{
+opacity:1;
+}
+}
+</style>
 </head>
+
 <body>
 
-  <div id="loading-box" class="card">
-    <div class="flower-icon">🌹</div>
-    <h2>Love.css</h2>
-    <p id="loading-status">Loading Love.css ...</p>
-    <button id="bloom-btn" disabled>TAP TO BLOOM</button>
-  </div>
+<div class="scene">
 
-  <div id="flower-container" class="hidden">
-    <div class="flower">
-      <div class="stem"></div>
-      <div class="leaf leaf-left"></div>
-      <div class="leaf leaf-right"></div>
-      <div id="petals"></div>
-    </div>
-    <div class="message">I coded this for<br>you 🌹</div>
-  </div>
+<div class="stem"></div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const loadingStatus = document.getElementById('loading-status');
-      const bloomBtn = document.getElementById('bloom-btn');
-      const loadingBox = document.getElementById('loading-box');
-      const flowerContainer = document.getElementById('flower-container');
+<div class="leaf left"></div>
+<div class="leaf right"></div>
 
-      // Video loading status sequence
-      setTimeout(() => { loadingStatus.textContent = "Growing digital petals ..."; }, 800);
-      setTimeout(() => { loadingStatus.textContent = "Optimizing rendering ..."; }, 1600);
-      setTimeout(() => {
-        loadingStatus.textContent = "Ready to bloom!";
-        bloomBtn.disabled = false;
-        bloomBtn.classList.add('ready');
-      }, 2400);
+<div class="flower">
 
-      bloomBtn.addEventListener('click', () => {
-        loadingBox.classList.add('hidden');
-        flowerContainer.classList.remove('hidden');
-        createPetals();
-      });
+<div class="petal p1"></div>
+<div class="petal p2"></div>
+<div class="petal p3"></div>
+<div class="petal p4"></div>
+<div class="petal p5"></div>
+<div class="petal p6"></div>
+<div class="petal p7"></div>
+<div class="petal p8"></div>
 
-      // Video Exact Code Algorithm
-      function createPetals() {
-        const PETAL_LAYERS = [
-          { layer: 1, count: 12, w: 38, h: 58 },
-          { layer: 2, count: 9,  w: 30, h: 46 },
-          { layer: 3, count: 6,  w: 22, h: 34 }
-        ];
+<div class="center"></div>
 
-        const petalsContainer = document.getElementById('petals');
+</div>
 
-        PETAL_LAYERS.forEach(({ layer, count, w, h }) => {
-          const angleStep = 360 / count;
-          const layerOffset = (layer * 15);
+</div>
 
-          for (let i = 0; i < count; i++) {
-            const petal = document.createElement('div');
-            petal.className = `petal layer-${layer}`;
-
-            const angle = layerOffset + i * angleStep;
-            const delay = 1.0 + (layer * 0.25) + (i * 0.04);
-            const scaleFilter = 0.9 + (Math.random() - 0.5) * 0.1;
-            const translateY = -(layer * 6);
-
-            petal.style.width = `${w}px`;
-            petal.style.height = `${h}px`;
-            petal.style.animationDelay = `${delay}s`;
-
-            petal.style.setProperty('--angle', `${angle}deg`);
-            petal.style.setProperty('--scale', scaleFilter);
-            petal.style.setProperty('--ty', `${translateY}px`);
-
-            petalsContainer.appendChild(petal);
-          }
-        });
-      }
-    });
-  </script>
 </body>
 </html>
