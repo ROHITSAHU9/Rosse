@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Love.css - 3D Bloom</title>
+  <title>Realistic 3D Rose Bloom</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background-color: #000;
+      background-color: #000; /* Dark background like video */
       color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: 'Georgia', serif;
       height: 100vh;
       overflow: hidden;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
     }
 
-    /* Start UI Box */
+    /* Start Card UI */
     .card {
       background: #111;
       border: 1px solid #222;
@@ -30,8 +31,8 @@
       position: absolute;
     }
     .flower-icon { font-size: 35px; margin-bottom: 12px; }
-    .card h2 { font-size: 20px; margin-bottom: 6px; font-weight: 600; }
-    .card p { font-size: 13px; color: #888; margin-bottom: 25px; }
+    .card h2 { font-size: 20px; margin-bottom: 6px; font-weight: 600; font-family: sans-serif; }
+    .card p { font-size: 13px; color: #888; margin-bottom: 25px; font-family: sans-serif; }
 
     #bloom-btn {
       width: 100%;
@@ -63,18 +64,18 @@
       position: relative;
     }
 
+    /* Message Text styling like the video end */
     .message {
       position: absolute;
       bottom: 10%;
       width: 100%;
       text-align: center;
-      font-size: 24px;
-      color: #ff5e83;
-      font-family: 'Georgia', serif;
+      font-size: 28px;
+      color: #ff8fa3; /* Pinkish text */
       font-style: italic;
       opacity: 0;
       transition: opacity 2s ease-in-out;
-      text-shadow: 0 0 10px rgba(255, 94, 131, 0.6);
+      text-shadow: 0 0 15px rgba(255, 143, 163, 0.7);
     }
     .message.show { opacity: 1; }
   </style>
@@ -102,125 +103,149 @@
     bloomBtn.addEventListener('click', () => {
       loadingBox.classList.add('hidden');
       canvasContainer.classList.remove('hidden');
-      init3DRose();
+      initRealisticRose();
     });
 
-    function init3DRose() {
+    function initRealisticRose() {
+      // 1. Scene, Camera, Renderer Setup
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.shadowMap.enabled = true; // Enable shadows for realism
       canvasContainer.appendChild(renderer.domElement);
 
-      // Lighting Setup
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+      // 2. Lighting for Realism (Crucial!)
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-      dirLight.position.set(5, 10, 7);
-      scene.add(dirLight);
+      const spotLight = new THREE.SpotLight(0xffffff, 1);
+      spotLight.position.set(5, 10, 5);
+      spotLight.castShadow = true;
+      spotLight.shadow.mapSize.width = 1024;
+      spotLight.shadow.mapSize.height = 1024;
+      scene.add(spotLight);
 
-      const redLight = new THREE.PointLight(0xff0044, 2, 10);
-      redLight.position.set(0, 2, 2);
-      scene.add(redLight);
+      const pointLight = new THREE.PointLight(0xff0044, 1.5, 10); // Red highlight
+      pointLight.position.set(-2, 2, 2);
+      scene.add(pointLight);
 
-      // 1. Stem (Green Cylinder)
-      const stemGeo = new THREE.CylinderGeometry(0.08, 0.08, 4, 32);
-      const stemMat = new THREE.MeshStandardMaterial({ color: 0x1b4d1b, roughness: 0.6 });
-      const stem = new THREE.Mesh(stemGeo, stemMat);
-      stem.position.y = -3;
-      scene.add(stem);
-
-      // 2. Rose Petals Group
-      const roseGroup = new THREE.Group();
-      roseGroup.position.y = -1;
-      scene.add(roseGroup);
-
-      const petalMat = new THREE.MeshStandardMaterial({
-        color: 0xc9002b,
-        roughness: 0.3,
-        metalness: 0.1,
+      // 3. Realistic Materials
+      const stemMat = new THREE.MeshStandardMaterial({ color: 0x2e8b57, roughness: 0.8, metalness: 0 }); // SeaGreen
+      const petalMat = new THREE.MeshStandardMaterial({ 
+        color: 0xd90429, // Bright Red
+        roughness: 0.4, 
+        metalness: 0.05,
         side: THREE.DoubleSide
       });
 
-      const petals = [];
-      const layers = 5;
-      
-      for (let l = 0; l < layers; l++) {
-        const count = 5 + l * 3;
-        const radius = 0.2 + l * 0.15;
-        for (let i = 0; i < count; i++) {
-          const angle = (i / count) * Math.PI * 2 + (l * 0.5);
-          
-          const petalGeo = new THREE.SphereGeometry(
-            0.4 + l * 0.1, 16, 16, 0, Math.PI, 0, Math.PI / 2
-          );
-          
-          const petal = new THREE.Mesh(petalGeo, petalMat);
-          petal.scale.set(1, 1.2, 0.3);
-          
-          // Initial Closed State
-          petal.position.set(0, 0, 0);
-          petal.rotation.y = angle;
-          petal.rotation.x = 0.2;
+      // 4. Geometry & Objects
 
+      // Stem
+      const stemGeo = new THREE.CylinderGeometry(0.06, 0.06, 4, 16);
+      const stem = new THREE.Mesh(stemGeo, stemMat);
+      stem.position.y = -3; // Start below screen
+      stem.castShadow = true;
+      scene.add(stem);
+
+      // Rose Petals Group (Initial Bud State)
+      const roseGroup = new THREE.Group();
+      roseGroup.position.y = -1; // Position where rose will bloom
+      scene.add(roseGroup);
+
+      const petals = [];
+      const petalLayers = [
+        { r: 0.1, count: 4,  startRotX: 0.1,  endRotX: 1.1 }, // Inner
+        { r: 0.2, count: 6,  startRotX: 0.15, endRotX: 1.0 },
+        { r: 0.35, count: 8,  startRotX: 0.2,  endRotX: 0.9 },
+        { r: 0.5, count: 10, startRotX: 0.25, endRotX: 0.8 }  // Outer
+      ];
+
+      petalLayers.forEach((layer, layerIdx) => {
+        for (let i = 0; i < layer.count; i++) {
+          const angle = (i / layer.count) * Math.PI * 2;
+          
+          // Petal geometry: custom shape using SphereGeometry
+          const petalGeo = new THREE.SphereGeometry(
+            0.3 + layerIdx * 0.1, 20, 20, 0, Math.PI, 0, Math.PI / 2
+          );
+          const petal = new THREE.Mesh(petalGeo, petalMat);
+          
+          // Scale and initial close position
+          petal.scale.set(1, 1.3, 0.2); 
+          petal.position.set(0, 0, 0); 
+          petal.rotation.y = angle;
+          petal.rotation.x = layer.startRotX; // Almost closed bud
+          petal.castShadow = true;
+
+          // Store animation targets
           petal.userData = {
-            targetRotX: 0.8 + (l * 0.15),
-            targetRad: radius,
-            layer: l,
-            angle: angle
+            angle: angle,
+            startRotX: layer.startRotX,
+            endRotX: layer.endRotX,
+            startRad: 0,
+            endRad: layer.r,
+            layer: layerIdx
           };
 
           roseGroup.add(petal);
           petals.push(petal);
         }
-      }
+      });
 
+      // 5. Animation Loop
       camera.position.z = 5;
       camera.position.y = 0;
 
       let progress = 0;
+      const bloomSpeed = 0.005;
 
       function animate() {
         requestAnimationFrame(animate);
 
         if (progress < 1) {
-          progress += 0.008;
+          progress += bloomSpeed;
 
-          // Animate Stem Growing Up
-          if (stem.position.y < -1) {
+          // Stem grows up
+          if (stem.position.y < -1.5) {
             stem.position.y += 0.02;
           }
 
-          // Animate Petals Blooming Outward
+          // Petals bloom
           petals.forEach(p => {
-            const delay = p.userData.layer * 0.15;
+            const data = p.userData;
+            const delay = data.layer * 0.15; // Inner layers first
+            
             if (progress > delay) {
               const pProgress = Math.min((progress - delay) * 2, 1);
               
-              p.rotation.x = THREE.MathUtils.lerp(0.2, p.userData.targetRotX, pProgress);
+              // Rotate outward
+              p.rotation.x = THREE.MathUtils.lerp(data.startRotX, data.endRotX, pProgress);
               
-              const currentRad = THREE.MathUtils.lerp(0, p.userData.targetRad, pProgress);
-              p.position.x = Math.sin(p.userData.angle) * currentRad;
-              p.position.z = Math.cos(p.userData.angle) * currentRad;
+              // Move outward radially
+              const currentRad = THREE.MathUtils.lerp(data.startRad, data.endRad, pProgress);
+              p.position.x = Math.sin(data.angle) * currentRad;
+              p.position.z = Math.cos(data.angle) * currentRad;
             }
           });
 
-          if (progress >= 0.9) {
+          // Show text at end
+          if (progress >= 0.95) {
             textMsg.classList.add('show');
           }
         }
 
-        // Slow rotation for 3D view
-        roseGroup.rotation.y += 0.005;
+        // Slow rotation for 3D effect
+        roseGroup.rotation.y += 0.003;
 
         renderer.render(scene, camera);
       }
 
       animate();
 
+      // Handle Resize
       window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
