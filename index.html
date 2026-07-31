@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Love.css - Bloom Rose</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #050505;
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    /* Starter Card Box */
+    .card {
+      background: #111111;
+      border: 1px solid #222222;
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+      width: 280px;
+      z-index: 10;
+    }
+
+    .flower-icon {
+      font-size: 35px;
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      font-size: 20px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #888888;
+      margin-bottom: 25px;
+    }
+
+    #bloom-btn {
+      width: 100%;
+      padding: 12px 0;
+      border: none;
+      border-radius: 25px;
+      background: #ff2a5f;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 42, 95, 0.6);
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Container & Canvas */
+    #canvas-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    /* Text Message below the Rose */
+    .message {
+      position: absolute;
+      bottom: 12%;
+      font-size: 24px;
+      color: #ff5e83;
+      font-family: 'Brush Script MT', 'Georgia', cursive, serif;
+      opacity: 0;
+      text-shadow: 0 0 10px rgba(255, 94, 131, 0.5);
+      transition: opacity 2s ease-in-out;
+    }
+
+    .message.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-box" class="card">
+    <div class="flower-icon">🌹</div>
+    <h2>Love.css</h2>
+    <p>Ready to bloom!</p>
+    <button id="bloom-btn">TAP TO BLOOM</button>
+  </div>
+
+  <div id="canvas-container" class="hidden">
+    <canvas id="roseCanvas"></canvas>
+    <div id="text-msg" class="message">I coded this for you</div>
+  </div>
+
+  <script>
+    const bloomBtn = document.getElementById('bloom-btn');
+    const loadingBox = document.getElementById('loading-box');
+    const canvasContainer = document.getElementById('canvas-container');
+    const canvas = document.getElementById('roseCanvas');
+    const ctx = canvas.getContext('2d');
+    const textMsg = document.getElementById('text-msg');
+
+    canvas.width = 400;
+    canvas.height = 600;
+
+    bloomBtn.addEventListener('click', () => {
+      loadingBox.classList.add('hidden');
+      canvasContainer.classList.remove('hidden');
+      startRoseAnimation();
+    });
+
+    function startRoseAnimation() {
+      let progress = 0;
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Draw Stem (Growing from bottom)
+        if (progress > 0) {
+          ctx.beginPath();
+          ctx.lineWidth = 8;
+          ctx.strokeStyle = '#2d6a3f';
+          ctx.lineCap = 'round';
+          
+          let stemHeight = Math.min(progress * 350, 320);
+          ctx.moveTo(200, 550);
+          ctx.quadraticCurveTo(195, 550 - stemHeight / 2, 200, 550 - stemHeight);
+          ctx.stroke();
+        }
+
+        // 2. Draw Leaves
+        if (progress > 0.3) {
+          let leafProgress = Math.min((progress - 0.3) * 3, 1);
+          
+          // Left Leaf
+          drawLeaf(197, 430, -35, leafProgress);
+          // Right Leaf
+          drawLeaf(202, 370, 35, leafProgress);
+        }
+
+        // 3. Draw Rose Petals Blooming
+        if (progress > 0.5) {
+          let bloomProgress = Math.min((progress - 0.5) * 2, 1);
+          draw3DRose(200, 230, bloomProgress);
+        }
+
+        // 4. Show Message Text
+        if (progress >= 1) {
+          textMsg.classList.add('show');
+        }
+
+        if (progress < 1) {
+          progress += 0.006; // Control animation speed
+          requestAnimationFrame(animate);
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function drawLeaf(x, y, angle, scale) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate((angle * Math.PI) / 180);
+      ctx.scale(scale, scale);
+
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(-25, -15, -45, -5);
+      ctx.quadraticCurveTo(-20, 20, 0, 0);
+      
+      let grad = ctx.createLinearGradient(-45, 0, 0, 0);
+      grad.addColorStop(0, '#2d6a3f');
+      grad.addColorStop(1, '#429e5d');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function draw3DRose(cx, cy, bloom) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // Calyx (Green base under flower)
+      ctx.fillStyle = '#2d6a3f';
+      for(let i = -2; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.arc(i * 8, 25, 6, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Outer to Inner Petals Layering
+      const petalLayers = [
+        { r: 65 * bloom, count: 7, color1: '#8a031e', color2: '#d90429' },
+        { r: 48 * bloom, count: 6, color1: '#a60424', color2: '#ef233c' },
+        { r: 32 * bloom, count: 5, color1: '#c9002b', color2: '#ff4d6d' },
+        { r: 18 * bloom, count: 4, color1: '#ff0033', color2: '#ff758f' },
+        { r: 8 * bloom,  count: 3, color1: '#ff4d6d', color2: '#ffb3c1' }
+      ];
+
+      petalLayers.forEach((layer) => {
+        let step = (Math.PI * 2) / layer.count;
+        for (let i = 0; i < layer.count; i++) {
+          let angle = i * step;
+          ctx.save();
+          ctx.rotate(angle);
+
+          ctx.beginPath();
+          ctx.arc(0, -layer.r / 2, layer.r, 0, Math.PI * 2);
+          
+          let grad = ctx.createRadialGradient(0, -layer.r / 2, 2, 0, -layer.r / 2, layer.r);
+          grad.addColorStop(0, layer.color2);
+          grad.addColorStop(1, layer.color1);
+          
+          ctx.fillStyle = grad;
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+          ctx.shadowBlur = 6;
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+
+      ctx.restore();
+    }
+  </script>
+</body>
+</html>
